@@ -32,5 +32,6 @@ module controller (
       ALUOp,
       ALUControl
   );
-  assign PCSrc = Branch & Zero | Jump;
+  // added XOR gate for bne
+  assign PCSrc = (Branch & (Zero ^ funct3[0])) | Jump;
 endmodule
