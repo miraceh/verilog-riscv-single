@@ -26,18 +26,21 @@ module testbench ();
   end
   // check results
   always @(negedge clk) begin
-    // // mem1.x
-    // if (DataAdr === 100 & WriteData === 25) begin
-    //   $display("Mem1 hex Simulation succeeded");
-    //   $stop;
-    // end else if (DataAdr !== 96) begin
-    //   $display("Simulation failed");
-    //   $stop;
+    // test1.hex
+    // if (MemWrite) begin
+    //     if (DataAdr === 100 & WriteData === 25) begin
+    //     $display("-------Test1 Simulation succeeded-------");
+    //     $stop;
+    //     end else if (DataAdr !== 96) begin
+    //     $display("Simulation failed");
+    //     $stop;
+    //     end
     // end
-    // mem2.hex
+
+    // test2.hex
     if (MemWrite) begin
       if (DataAdr === 216 & WriteData === 4140) begin
-        $display("Test assembly Simulation succeeded!");
+        $display("Test2 Simulation succeeded!");
         $stop;
       end
     end
