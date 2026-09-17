@@ -63,8 +63,11 @@ class cpu_coverage extends uvm_subscriber #(cpu_item);
       bins taken     = {1};
     }
 
-    instruction_register_cross:
-      cross cp_instruction, cp_rs1;
+instruction_register_cross:
+  cross cp_instruction, cp_rs1 {
+    ignore_bins jal_cross =
+        binsof(cp_instruction) intersect {JAL};
+  }
 
   endgroup
 

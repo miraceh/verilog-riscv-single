@@ -3,3 +3,4 @@ sim.out
 work
 dump.vcd
 transcript
+coverage*

@@ -51,7 +51,7 @@ compile: work
 
 run:
 	$(VSIM) -c $(VSIM_FLAGS) $(TOP) \
-		-do "run -all; coverage save coverage.ucdb; quit -f"
+		-do "coverage save -onexit coverage.ucdb; run -all; quit -f"
 
 
 # 只有需要调试时才打开GUI并记录波形
