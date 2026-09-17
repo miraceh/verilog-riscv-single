@@ -1,38 +1,65 @@
-# 目标文件名
-TOP_MODULE=top
-TB=testbench
-OUT=sim.out
+VLOG = vlog
+VSIM = vsim
 
-# iverilog 编译选项
-IVERILOG=iverilog
-VVP=vvp
-GTKWAVE=gtkwave
+QUESTA_HOME ?= /opt/questa
+UVM_HOME    ?= $(QUESTA_HOME)/verilog_src/uvm-1.2
 
-# 查找所有 Verilog/SystemVerilog 文件
-SRCDIR=src/top
-VFILES=$(wildcard $(SRCDIR)/core/*.sv \
-                  $(SRCDIR)/core/block/*.sv \
-                  $(SRCDIR)/core/controller/*.sv \
-                  $(SRCDIR)/core/datapath/*.sv \
-                  $(SRCDIR)/memory/*.sv)
+TOP = tb_top
 
-# 默认目标
+RTL_FILES = \
+	src/top/core/block/adder.sv \
+	src/top/core/block/flopenr.sv \
+	src/top/core/block/flopr.sv \
+	src/top/core/block/mux2.sv \
+	src/top/core/block/mux3.sv \
+	src/top/core/controller/aludec.sv \
+	src/top/core/controller/maindec.sv \
+	src/top/core/controller/controller.sv \
+	src/top/core/datapath/alu.sv \
+	src/top/core/datapath/extend.sv \
+	src/top/core/datapath/regfile.sv \
+	src/top/core/datapath/datapath.sv \
+	src/top/core/core.sv \
+	src/top/top.sv
+
+TB_FILES = \
+	sim/uvm/cpu_if.sv \
+	sim/uvm/cpu_pkg.sv \
+	sim/testbench.sv
+
+VLOG_FLAGS = \
+	-sv \
+	+incdir+$(UVM_HOME)/src \
+	+incdir+sim/uvm
+
+VSIM_FLAGS = \
+	-voptargs=+acc \
+	-coverage
+
+.PHONY: all compile run wave clean
+
 all: compile run
 
-# 编译
-compile:
-	$(IVERILOG) -g2012 -o $(OUT) \
-	    -I $(SRCDIR) -I $(SRCDIR)/core -I $(SRCDIR)/memory \
-	    $(SRCDIR)/top.sv $(VFILES) sim/$(TB).sv
 
-# 运行仿真
+work:
+	vlib work
+
+
+compile: work
+	$(VLOG) $(VLOG_FLAGS) $(RTL_FILES) $(TB_FILES)
+
+
 run:
-	$(VVP) $(OUT)
+	$(VSIM) -c $(VSIM_FLAGS) $(TOP) \
+		-do "run -all; coverage save coverage.ucdb; quit -f"
 
-# 查看波形
+
+# 只有需要调试时才打开GUI并记录波形
 wave:
-	$(GTKWAVE) dump.vcd &
+	$(VSIM) $(VSIM_FLAGS) $(TOP) \
+		-do "add wave -r sim:/$(TOP)/*; run -all"
 
-# 清理编译输出
+
 clean:
-	rm -f $(OUT) dump.vcd
+	vdel -all -lib work
+	rm -f transcript vsim.wlf coverage.ucdb dump.vcd

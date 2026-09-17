@@ -1,48 +1,53 @@
-module testbench ();
-  logic clk;
-  logic reset;
-  logic [31:0] WriteData, DataAdr;
-  logic MemWrite;
-  // instantiate device to be tested
-  top dut (
-      clk,
-      reset,
-      WriteData,
-      DataAdr,
-      MemWrite
-  );
-  // initialize test
-  initial begin
-    reset <= 1;
-    #22;
-    reset <= 0;
-  end
-  // generate clock to sequence tests
-  always begin
-    clk <= 1;
-    #5;
-    clk <= 0;
-    #5;
-  end
-  // check results
-  always @(negedge clk) begin
-    // test1.hex
-    // if (MemWrite) begin
-    //     if (DataAdr === 100 & WriteData === 25) begin
-    //     $display("-------Test1 Simulation succeeded-------");
-    //     $stop;
-    //     end else if (DataAdr !== 96) begin
-    //     $display("Simulation failed");
-    //     $stop;
-    //     end
-    // end
+`timescale 1ns/1ps
 
-    // test2.hex
-    if (MemWrite) begin
-      if (DataAdr === 216 & WriteData === 4140) begin
-        $display("Test2 Simulation succeeded!");
-        $stop;
-      end
-    end
+module tb_top;
+
+  import uvm_pkg::*;
+  import cpu_pkg::*;
+
+  logic clk = 1'b0;
+
+  always #5 clk = ~clk;
+
+
+  cpu_if intf (
+      .clk(clk)
+  );
+
+
+  top dut (
+      .clk        (clk),
+      .reset      (intf.reset),
+      .Instr      (intf.instr),
+      .ReadData   (intf.read_data),
+      .PC         (intf.pc),
+      .MemWrite   (intf.mem_write),
+      .ALUResult  (intf.alu_result),
+      .WriteData  (intf.write_data)
+  );
+
+// 将执行前的rs1操作数提供给monitor采样
+assign intf.src_a = dut.core.dp.SrcA;
+
+  initial begin
+    intf.reset     = 1'b1;
+    intf.instr     = 32'h00000013; // addi x0, x0, 0
+    intf.read_data = 32'b0;
+
+    uvm_config_db #(virtual cpu_if)::set(
+        null,
+        "uvm_test_top.env.agent.*",
+        "vif",
+        intf
+    );
+
+    run_test("cpu_test");
   end
+
+
+  initial begin
+    $dumpfile("dump.vcd");
+    $dumpvars(0, tb_top);
+  end
+
 endmodule
