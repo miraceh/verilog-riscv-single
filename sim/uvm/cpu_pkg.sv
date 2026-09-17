@@ -6,6 +6,7 @@ package cpu_pkg;
 
   `include "cpu_item.sv"
   `include "cpu_sequence.sv"
+  `include "cpu_directed_sequence.sv"
   `include "cpu_sequencer.sv"
   `include "cpu_driver.sv"
   `include "cpu_monitor.sv"
