@@ -3,4 +3,7 @@ sim.out
 work
 dump.vcd
 transcript
-coverage*
+
+code_coverage.txt
+coverage.ucdb
+coverage.txt

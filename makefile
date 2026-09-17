@@ -46,12 +46,13 @@ work:
 
 
 compile: work
-	$(VLOG) $(VLOG_FLAGS) $(RTL_FILES) $(TB_FILES)
+	$(VLOG) $(VLOG_FLAGS) +cover=bcesft $(RTL_FILES)
+	$(VLOG) $(VLOG_FLAGS) $(TB_FILES)
 
 
 run:
 	$(VSIM) -c $(VSIM_FLAGS) $(TOP) \
-		-do "coverage save -onexit coverage.ucdb; run -all; quit -f"
+		-do "do sim/coverage_exclusions.do; coverage save -onexit coverage.ucdb; run -all; quit -f"
 
 
 # 只有需要调试时才打开GUI并记录波形

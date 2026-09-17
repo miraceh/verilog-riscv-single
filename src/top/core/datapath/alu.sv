@@ -24,6 +24,9 @@ module alu (
       default: result = 32'bx;
     endcase
   end
-  assign zero = (result == 32'b0);
+  // for coverage purpose, we need to use always_comb instead of assign
+  always_comb begin
+    zero = (result == 32'b0);
+  end
   assign v = ~(alucontrol[0] ^ a[31] ^ b[31]) & (a[31] ^ sum[31]) & isAddSub;
 endmodule
