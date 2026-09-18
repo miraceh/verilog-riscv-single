@@ -71,5 +71,5 @@ coverage:
 	$(VCOVER) report -details -output full_coverage.txt $(UCDB)
 
 clean:
+	rm -f transcript vsim.wlf coverage.ucdb dump.vcd coverage.txt full_coverage.txt regression/*
 	vdel -all -lib work
-	rm -f transcript vsim.wlf coverage.ucdb dump.vcd coverage.txt full_coverage.txt

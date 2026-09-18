@@ -58,6 +58,17 @@ def main():
     output_dir = Path("regression")
     output_dir.mkdir(exist_ok=True)
 
+    print("Compiling design...")
+
+    return_code, _ = run_command(
+        ["make", "compile"],
+        output_dir / "compile.log",
+    )
+
+    if return_code != 0:
+        print(f"Compilation failed, log={output_dir}/compile.log")
+        return 1
+
     passed_ucdbs = []
     passed = 0
 
