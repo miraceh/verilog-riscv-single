@@ -1,8 +1,13 @@
 VLOG = vlog
 VSIM = vsim
+VCOVER := vcover
+UCDB   := coverage.ucdb
+COV_REPORT := coverage.txt
 
 QUESTA_HOME ?= /opt/questa
 UVM_HOME    ?= $(QUESTA_HOME)/verilog_src/uvm-1.2
+SEED ?= random
+UCDB ?= coverage.ucdb
 
 TOP = tb_top
 
@@ -34,9 +39,10 @@ VLOG_FLAGS = \
 
 VSIM_FLAGS = \
 	-voptargs=+acc \
-	-coverage
+	-coverage \
+	-sv_seed $(SEED)
 
-.PHONY: all compile run wave clean
+.PHONY: all compile run coverage clean
 
 all: compile run
 
@@ -52,7 +58,7 @@ compile: work
 
 run:
 	$(VSIM) -c $(VSIM_FLAGS) $(TOP) \
-		-do "do sim/coverage_exclusions.do; coverage save -onexit coverage.ucdb; run -all; quit -f"
+		-do "do sim/coverage_exclusions.do; coverage save -onexit $(UCDB); run -all; quit -f"
 
 
 # 只有需要调试时才打开GUI并记录波形
@@ -60,7 +66,10 @@ wave:
 	$(VSIM) $(VSIM_FLAGS) $(TOP) \
 		-do "add wave -r sim:/$(TOP)/*; run -all"
 
+coverage:
+	$(VCOVER) report -details -cvg -output coverage.txt $(UCDB)
+	$(VCOVER) report -details -output full_coverage.txt $(UCDB)
 
 clean:
 	vdel -all -lib work
-	rm -f transcript vsim.wlf coverage.ucdb dump.vcd
+	rm -f transcript vsim.wlf coverage.ucdb dump.vcd coverage.txt full_coverage.txt

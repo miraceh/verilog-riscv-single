@@ -5,5 +5,9 @@ dump.vcd
 transcript
 
 code_coverage.txt
-coverage.ucdb
 coverage.txt
+full_coverage.txt
+regression/functional_coverage.txt
+
+*.log
+*.ucdb
